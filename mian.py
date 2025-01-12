@@ -49,11 +49,11 @@ def main():
 
         if is_short_link(link):
             short_link = link
-            print('Просмотров',get_link_stats(token, short_link)['response']['views'])
+            print('Просмотров',get_link_stats(token, short_link)['response']['stats'][0]['views'])
         else:
             short_link = get_vk_link(token, link)['response']['short_url']
             print('Сокращённая ссылка:', get_vk_link(token, link)['response']['short_url'])
-            print('Просмотров',get_link_stats(token, short_link)['response']['views'])
+            print('Просмотров',get_link_stats(token, short_link)['response']['stats'][0]['views'])
 
 
     except requests.exceptions.RequestException as e:
