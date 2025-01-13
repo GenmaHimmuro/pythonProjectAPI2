@@ -15,12 +15,10 @@ def is_short_link(link,token):
     url = 'https://api.vk.com/method/utils.getLinkStats'
     response = requests.get(url, params=payload)
     response.raise_for_status()
-    if 'error' in response.json():
-        return False
-    return True
+    return not 'error' in response.json()
 
 
-def get_link_vk_format(token, link):
+def shorten_link(token, link):
     payload = {
         'url' : link,
         'access_token' : token,
@@ -29,10 +27,10 @@ def get_link_vk_format(token, link):
     url = 'https://api.vk.com/method/utils.getShortLink'
     response = requests.get(url, params=payload)
     response.raise_for_status()
-    return response.json()
+    return response.json()['response']['short_url']
 
 
-def get_quantity_clicks(token,short_link):
+def count_clicks(token,short_link):
     payload = {
         "access_token": token,
         "v": '5.199',
@@ -43,7 +41,7 @@ def get_quantity_clicks(token,short_link):
     url = 'https://api.vk.com/method/utils.getLinkStats'
     response = requests.get(url, params=payload)
     response.raise_for_status()
-    return response.json()
+    return response.json()['response']['stats'][0]['views']
 
 
 def main():
@@ -57,11 +55,11 @@ def main():
 
         if is_short_link(link,token):
                 short_link = link
-                print('Просмотров',get_quantity_clicks(token, short_link)['response']['stats'][0]['views'])
+                print('Просмотров',count_clicks(token, short_link))
         else:
-                short_link = get_link_vk_format(token, link)['response']['short_url']
+                short_link = shorten_link(token, link)
                 print(f'Сокращённая ссылка: {short_link}',
-                      '\nПросмотров:',get_quantity_clicks(token, short_link)['response']['stats'][0]['views'])
+                      '\nПросмотров:',count_clicks(token, short_link))
 
 
     except requests.exceptions.RequestException as e:
